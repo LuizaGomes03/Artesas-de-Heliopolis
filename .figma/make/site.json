@@ -1,0 +1,10 @@
+{
+  "description": "Empowering women artisans in Heliópolis, this platform facilitates product export, expanding market reach and boosting community income.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
