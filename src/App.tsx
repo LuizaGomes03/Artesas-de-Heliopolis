@@ -780,6 +780,11 @@ function LoginPage({ lang, onLogin, onCreateAccount }: { lang: Lang; onLogin: (r
 
 function AccountDashboard({ lang, role, onBack }: { lang: Lang; role: AccountRole; onBack: () => void }) {
   const artisan = role === "artisan";
+  const artisanNav = lang === "en"
+    ? ["Products", "Orders", "Messages", "Export", "Help"]
+    : lang === "es"
+      ? ["Productos", "Pedidos", "Mensajes", "Exportación", "Ayuda"]
+      : ["Produtos", "Pedidos", "Mensagens", "Exportação", "Ajuda"];
   const copy = artisan
     ? {
         eyebrow: lang === "en" ? "ARTISAN DASHBOARD" : lang === "es" ? "PANEL DE ARTESANA" : "PAINEL DA ARTESÃ",
@@ -796,6 +801,16 @@ function AccountDashboard({ lang, role, onBack }: { lang: Lang; role: AccountRol
 
   return (
     <main className="new-page">
+      {artisan && <header style={{ background: "#FBF5E9", borderBottom: `1px solid ${C.border}`, padding: "18px 24px" }}>
+        <div style={{ maxWidth: 1050, margin: "0 auto", display: "flex", alignItems: "center", gap: 22, flexWrap: "wrap" }}>
+          <strong style={{ color: C.primary, fontFamily: "var(--font-fraunces)", fontSize: 21 }}>Artesãs de Heliópolis</strong>
+          <nav aria-label="Navegação da artesã" style={{ display: "flex", gap: 18, flex: 1, flexWrap: "wrap" }}>
+            {artisanNav.map(item => <button key={item} type="button" style={{ border: "none", background: "none", color: C.fgDim, cursor: "pointer", fontFamily: "var(--font-nunito)", fontWeight: 600 }}>{item}</button>)}
+          </nav>
+          <span aria-label="Notificações" style={{ fontSize: 19 }}>🔔</span>
+          <strong style={{ fontSize: 13 }}>Maria das Graças</strong>
+        </div>
+      </header>}
       <section style={{ padding: "76px 24px 100px", background: C.bg, minHeight: "calc(100vh - 100px)" }}>
         <div style={{ maxWidth: 1050, margin: "0 auto" }}>
           <button type="button" onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", padding: 0, fontWeight: 700, fontFamily: "var(--font-nunito)" }}>← {lang === "pt" ? "Voltar para a página inicial" : lang === "en" ? "Back to home" : "Volver al inicio"}</button>
@@ -887,6 +902,8 @@ export default function App() {
           margin: 0;
         }
 
+        .buyer-site-nav-hidden { display: none; }
+
         .site-nav-links {
           display: flex;
           align-items: center;
@@ -968,7 +985,7 @@ export default function App() {
         }
       `}</style>
 
-      <nav style={{
+      <nav className={accountRole === "artisan" && activePage === "accountDashboard" ? "buyer-site-nav-hidden" : undefined} style={{
         background: "#FBF5E9",
         borderBottom: `2px solid ${C.border}`,
         position: "sticky",
