@@ -407,7 +407,7 @@ function CustomerSupport({ lang }: { lang: Lang }) {
 // ─── user menu ────────────────────────────────────────────────────────────────
 type AccountRole = "buyer" | "artisan";
 
-function UserMenu({ lang, signedIn, role, onLogin, onCreateAccount, onArtisanSignup, onOpenAccount }: { lang: Lang; signedIn: boolean; role: AccountRole | null; onLogin: () => void; onCreateAccount: () => void; onArtisanSignup: () => void; onOpenAccount: () => void }) {
+function UserMenu({ lang, signedIn, role, onLogin, onCreateAccount, onArtisanSignup, onOpenAccount, onBuyerOrders, onBuyerSettings }: { lang: Lang; signedIn: boolean; role: AccountRole | null; onLogin: () => void; onCreateAccount: () => void; onArtisanSignup: () => void; onOpenAccount: () => void; onBuyerOrders: () => void; onBuyerSettings: () => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -489,27 +489,32 @@ function UserMenu({ lang, signedIn, role, onLogin, onCreateAccount, onArtisanSig
           zIndex: 200,
         }}>
           <div style={headingStyle}>{signedIn ? (role === "artisan" ? (lang === "pt" ? "Conta da artesã" : lang === "en" ? "Artisan account" : "Cuenta de artesana") : (lang === "pt" ? "Conta de comprador" : lang === "en" ? "Buyer account" : "Cuenta de comprador")) : (lang === "pt" ? "Minha conta" : lang === "en" ? "My account" : "Mi cuenta")}</div>
-          {signedIn && <button type="button" onClick={() => { close(); onOpenAccount(); }} style={itemStyle}>{role === "artisan" ? (lang === "pt" ? "Painel da artesã" : lang === "en" ? "Artisan dashboard" : "Panel de artesana") : (lang === "pt" ? "Minha conta" : lang === "en" ? "My account" : "Mi cuenta")}</button>}
+          {signedIn && role === "artisan" && <button type="button" onClick={() => { close(); onOpenAccount(); }} style={itemStyle}>{lang === "pt" ? "Painel da artesã" : lang === "en" ? "Artisan dashboard" : "Panel de artesana"}</button>}
+          {signedIn && role === "buyer" && <>
+            <button type="button" onClick={() => { close(); onBuyerOrders(); }} style={itemStyle}>{lang === "pt" ? "Ver onde está meu pedido" : lang === "en" ? "Track my order" : "Ver dónde está mi pedido"}</button>
+            <button type="button" onClick={close} style={itemStyle}>{lang === "pt" ? "Meu carrinho" : lang === "en" ? "My cart" : "Mi carrito"}</button>
+            <button type="button" onClick={() => { close(); onBuyerSettings(); }} style={itemStyle}>{lang === "pt" ? "Configurações da conta" : lang === "en" ? "Account settings" : "Configuración de la cuenta"}</button>
+          </>}
           {signedIn && <div style={{ padding: "8px 16px 12px", color: C.primary, fontSize: 13, fontWeight: 700 }}>✓ {lang === "pt" ? "Inscrição enviada" : lang === "en" ? "Application sent" : "Inscripción enviada"}</div>}
-          <button type="button" onClick={() => { close(); onCreateAccount(); }} style={itemStyle}
+          {!signedIn && <button type="button" onClick={() => { close(); onCreateAccount(); }} style={itemStyle}
             onMouseEnter={e => { e.currentTarget.style.background = C.muted; e.currentTarget.style.color = C.fg; }}
             onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = C.fgDim; }}>
             {lang === "pt" ? "Cadastrar-se" : lang === "en" ? "Sign up" : "Registrarse"}
-          </button>
-          <button type="button" onClick={() => { close(); onLogin(); }} style={itemStyle}
+          </button>}
+          {!signedIn && <button type="button" onClick={() => { close(); onLogin(); }} style={itemStyle}
             onMouseEnter={e => { e.currentTarget.style.background = C.muted; e.currentTarget.style.color = C.fg; }}
             onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = C.fgDim; }}>
             {lang === "pt" ? "Entrar" : lang === "en" ? "Log in" : "Iniciar sesión"}
-          </button>
+          </button>}
 
-          <div style={{ borderTop: `1px solid ${C.border}`, marginTop: 4 }} />
+          {!signedIn && <><div style={{ borderTop: `1px solid ${C.border}`, marginTop: 4 }} />
           <div style={headingStyle}>{lang === "pt" ? "Programa exclusivo" : lang === "en" ? "Exclusive program" : "Programa exclusivo"}</div>
           <div style={{ padding: "4px 16px 9px", color: C.fgDim, fontSize: 11.5, lineHeight: 1.4 }}>{lang === "pt" ? "Somente para mulheres artesãs de Heliópolis." : lang === "en" ? "Only for women artisans from Heliópolis." : "Solo para mujeres artesanas de Heliópolis."}</div>
           <button type="button" onClick={() => { close(); onArtisanSignup(); }} style={itemStyle}
             onMouseEnter={e => { e.currentTarget.style.background = C.muted; e.currentTarget.style.color = C.fg; }}
             onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = C.fgDim; }}>
             {lang === "pt" ? "Cadastrar-se" : lang === "en" ? "Sign up" : "Registrarse"}
-          </button>
+          </button>}
           <button type="button" onClick={() => { close(); onLogin(); }} style={{ ...itemStyle, paddingBottom: 14 }}
             onMouseEnter={e => { e.currentTarget.style.background = C.muted; e.currentTarget.style.color = C.fg; }}
             onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = C.fgDim; }}>
@@ -785,7 +790,7 @@ function AccountDashboard({ lang, role, onBack }: { lang: Lang; role: AccountRol
         eyebrow: lang === "en" ? "BUYER ACCOUNT" : lang === "es" ? "CUENTA DE COMPRADOR" : "CONTA DE COMPRADOR",
         title: lang === "en" ? "Welcome to your space for Brazilian craft." : lang === "es" ? "Bienvenida a tu espacio de artesanía brasileña." : "Bem-vinda ao seu espaço de arte brasileira.",
         intro: lang === "en" ? "Discover products, follow orders and keep your account details in one place." : lang === "es" ? "Descubre productos, sigue pedidos y administra tus datos en un solo lugar." : "Descubra produtos, acompanhe pedidos e organize seus dados em um só lugar.",
-        cards: lang === "en" ? [["My orders", "Follow delivery and see your purchase history."], ["Favorites", "Save pieces and artisans you want to visit again."], ["Payment cards", "Manage cards saved for secure checkout."], ["Profile settings", "Edit your photo, language and personal information."]] : lang === "es" ? [["Mis pedidos", "Sigue la entrega y consulta tu historial de compras."], ["Favoritos", "Guarda piezas y artesanas para volver cuando quieras."], ["Tarjetas de pago", "Gestiona las tarjetas guardadas para pagar con seguridad."], ["Configuración del perfil", "Edita tu foto, idioma e información personal."]] : [["Meus pedidos", "Acompanhe entregas e veja seu histórico de compras."], ["Favoritos", "Guarde peças e artesãs para visitar novamente."], ["Cartões para pagamento", "Gerencie os cartões salvos para comprar com segurança."], ["Configurações da conta", "Edite sua foto, idioma de origem e informações pessoais."]],
+        cards: lang === "en" ? [["Track my order", "Follow delivery and see your purchase history."], ["My cart", "Review the products selected for your next purchase."], ["Account settings", "Edit your photo, language and personal information."]] : lang === "es" ? [["Seguir mi pedido", "Sigue la entrega y consulta tu historial de compras."], ["Mi carrito", "Revisa los productos seleccionados para tu próxima compra."], ["Configuración de la cuenta", "Edita tu foto, idioma e información personal."]] : [["Ver onde está meu pedido", "Acompanhe a entrega e veja seu histórico de compras."], ["Meu carrinho", "Revise os produtos escolhidos para sua próxima compra."], ["Configurações da conta", "Edite sua foto, idioma de origem e informações pessoais."]],
       };
 
   return (
@@ -1061,7 +1066,7 @@ export default function App() {
               flexShrink: 0
             }}
           >
-            <UserMenu lang={lang} signedIn={accountCreated} role={accountRole} onOpenAccount={() => setActivePage("accountDashboard")} onCreateAccount={() => setActivePage("accountSignup")} onLogin={() => setActivePage("login")} onArtisanSignup={() => setActivePage("artisanSignup")} />
+            <UserMenu lang={lang} signedIn={accountCreated} role={accountRole} onOpenAccount={() => setActivePage("accountDashboard")} onBuyerOrders={() => setActivePage("accountDashboard")} onBuyerSettings={() => setActivePage("accountDashboard")} onCreateAccount={() => setActivePage("accountSignup")} onLogin={() => setActivePage("login")} onArtisanSignup={() => setActivePage("artisanSignup")} />
             <CartButton lang={lang} count={cartCount} />
             <LangSwitcher lang={lang} setLang={setLang} />
 
@@ -1649,7 +1654,7 @@ export default function App() {
         ) : activePage === "accountSignup" ? (
           <AccountSignupPage lang={lang} onCreated={() => { setAccountCreated(true); setAccountRole("buyer"); }} />
         ) : activePage === "login" ? (
-          <LoginPage lang={lang} onLogin={(role) => { setAccountCreated(true); setAccountRole(role); setActivePage("accountDashboard"); }} onCreateAccount={() => {
+          <LoginPage lang={lang} onLogin={(role) => { setAccountCreated(true); setAccountRole(role); setActivePage(role === "artisan" ? "accountDashboard" : "home"); }} onCreateAccount={() => {
             setActivePage("accountSignup");
           }} />
         ) : activePage === "accountDashboard" ? (
