@@ -30,6 +30,9 @@ const PRODUCTS = [
   { id: 6 as const, artisan: "Benedita Lima", price: "R$ 290", priceUSD: "USD 55", category: "Vestuário", image: "https://images.unsplash.com/photo-1508589452764-4e017240add7?w=400&h=400&fit=crop&auto=format", tags: { pt: ["Bordado", "Tecido", "Moda"], en: ["Embroidery", "Fabric", "Fashion"], es: ["Bordado", "Tela", "Moda"] } },
 ];
 
+const CAT_KEYS = ["all", "acessorios", "joias", "casa", "vestuario", "brinquedos"] as const;
+type CatKey = typeof CAT_KEYS[number];
+
 // ─── currency helpers ─────────────────────────────────────────────────────────
 // Product prices are shown according to the selected language.
 // PT = BRL, EN = USD, ES = EUR. The non-BRL values are intentionally kept
@@ -591,7 +594,7 @@ function QuemSomosPage({ lang, onJoin }: { lang: Lang; onJoin: () => void }) {
   );
 }
 
-function ProdutosPageNova({ lang, onJoin }: { lang: Lang; onJoin: () => void }) {
+function ProdutosPageNova({ lang, onJoin, activeCategory, catMap, onCategoryChange }: { lang: Lang; onJoin: () => void; activeCategory: CatKey; catMap: Record<CatKey, string>; onCategoryChange: (category: CatKey) => void }) {
   const content = T.productsPage;
 
   return (
@@ -601,11 +604,19 @@ function ProdutosPageNova({ lang, onJoin }: { lang: Lang; onJoin: () => void }) 
           <div style={{ color: C.primary, fontSize: 12, fontWeight: 800, letterSpacing: "0.14em" }}>{t(content.eyebrow, lang)}</div>
           <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: "clamp(2.5rem, 5vw, 4.3rem)", lineHeight: 1.04, margin: "14px 0 18px", letterSpacing: "-0.03em" }}>{t(content.title, lang)}</h1>
           <p style={{ color: C.fgDim, fontSize: 16, lineHeight: 1.8, maxWidth: 720, margin: 0 }}>{t(content.intro, lang)}</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 28 }}>
+            {CAT_KEYS.map(key => (
+              <button key={key} type="button" onClick={() => onCategoryChange(key)}
+                style={{ padding: "8px 18px", borderRadius: 99, fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.18s", background: activeCategory === key ? C.primary : "transparent", color: activeCategory === key ? C.bg : C.fgDim, border: `1.5px solid ${activeCategory === key ? C.primary : C.border}` }}>
+                {catMap[key]}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
       <section style={{ padding: "28px 24px 96px", background: C.bg }}>
         <div className="new-products-grid" style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 22 }}>
-          {PRODUCTS.map(p => (
+          {(activeCategory === "all" ? PRODUCTS : PRODUCTS.filter(p => p.category === ({ all: "Todos", acessorios: "Acessórios", joias: "Joias", casa: "Casa", vestuario: "Vestuário", brinquedos: "Brinquedos" } as Record<CatKey, string>)[activeCategory])).map(p => (
             <article key={p.id} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden" }}>
               <img src={p.image} alt={t(T.products.productNames[p.id], lang)} style={{ width: "100%", height: 260, objectFit: "cover", display: "block" }} />
               <div style={{ padding: 20 }}>
@@ -804,7 +815,7 @@ function AccountDashboard({ lang, role, onBack }: { lang: Lang; role: AccountRol
 export default function App() {
   const [lang, setLang] = useState<Lang>("pt");
   const [activePage, setActivePage] = useState<"home" | "about" | "products" | "login" | "artisanSignup" | "accountSignup" | "accountDashboard">("home");
-  const [activeCategory, setActiveCategory] = useState("Todos");
+  const [activeCategory, setActiveCategory] = useState<CatKey>("all");
   const [menuOpen, setMenuOpen] = useState(false);
   const [form, setForm] = useState({ nome: "", whatsapp: "", email: "", instagram: "", address: "", product: "" });
   const [submitted, setSubmitted] = useState(false);
@@ -819,8 +830,6 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activePage]);
 
-  const catKeys = ["all", "acessorios", "joias", "casa", "vestuario", "brinquedos"] as const;
-  type CatKey = typeof catKeys[number];
   const catMap: Record<CatKey, string> = {
     all: t(T.products.categories.all, lang),
     acessorios: t(T.products.categories.acessorios, lang),
@@ -1393,7 +1402,7 @@ export default function App() {
               </h2>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {catKeys.map(key => (
+              {CAT_KEYS.map(key => (
                 <button key={key} onClick={() => setActiveCategory(key)}
                   style={{ padding: "8px 18px", borderRadius: 99, fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.18s", background: activeCategory === key ? C.primary : "transparent", color: activeCategory === key ? C.bg : C.fgDim, border: `1.5px solid ${activeCategory === key ? C.primary : C.border}` }}>
                   {catMap[key]}
@@ -1646,7 +1655,7 @@ export default function App() {
         ) : activePage === "accountDashboard" ? (
           <AccountDashboard lang={lang} role={accountRole || "buyer"} onBack={() => setActivePage("home")} />
         ) : (
-          <ProdutosPageNova lang={lang} onJoin={() => {
+          <ProdutosPageNova lang={lang} activeCategory={activeCategory} catMap={catMap} onCategoryChange={setActiveCategory} onJoin={() => {
             setActivePage("artisanSignup");
           }} />
         )}
