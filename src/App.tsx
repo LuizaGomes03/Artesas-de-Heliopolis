@@ -30,9 +30,6 @@ const PRODUCTS = [
   { id: 6 as const, artisan: "Benedita Lima", price: "R$ 290", priceUSD: "USD 55", category: "Vestuário", image: "https://images.unsplash.com/photo-1508589452764-4e017240add7?w=400&h=400&fit=crop&auto=format", tags: { pt: ["Bordado", "Tecido", "Moda"], en: ["Embroidery", "Fabric", "Fashion"], es: ["Bordado", "Tela", "Moda"] } },
 ];
 
-const CAT_KEYS = ["all", "acessorios", "joias", "casa", "vestuario", "brinquedos"] as const;
-type CatKey = typeof CAT_KEYS[number];
-
 // ─── currency helpers ─────────────────────────────────────────────────────────
 // Product prices are shown according to the selected language.
 // PT = BRL, EN = USD, ES = EUR. The non-BRL values are intentionally kept
@@ -407,7 +404,7 @@ function CustomerSupport({ lang }: { lang: Lang }) {
 // ─── user menu ────────────────────────────────────────────────────────────────
 type AccountRole = "buyer" | "artisan";
 
-function UserMenu({ lang, signedIn, role, onLogin, onCreateAccount, onArtisanSignup, onOpenAccount, onBuyerOrders, onBuyerSettings }: { lang: Lang; signedIn: boolean; role: AccountRole | null; onLogin: () => void; onCreateAccount: () => void; onArtisanSignup: () => void; onOpenAccount: () => void; onBuyerOrders: () => void; onBuyerSettings: () => void }) {
+function UserMenu({ lang, signedIn, role, onLogin, onCreateAccount, onArtisanSignup, onOpenAccount }: { lang: Lang; signedIn: boolean; role: AccountRole | null; onLogin: () => void; onCreateAccount: () => void; onArtisanSignup: () => void; onOpenAccount: () => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -489,38 +486,32 @@ function UserMenu({ lang, signedIn, role, onLogin, onCreateAccount, onArtisanSig
           zIndex: 200,
         }}>
           <div style={headingStyle}>{signedIn ? (role === "artisan" ? (lang === "pt" ? "Conta da artesã" : lang === "en" ? "Artisan account" : "Cuenta de artesana") : (lang === "pt" ? "Conta de comprador" : lang === "en" ? "Buyer account" : "Cuenta de comprador")) : (lang === "pt" ? "Minha conta" : lang === "en" ? "My account" : "Mi cuenta")}</div>
-          {signedIn && role === "artisan" && <button type="button" onClick={() => { close(); onOpenAccount(); }} style={itemStyle}>{lang === "pt" ? "Painel da artesã" : lang === "en" ? "Artisan dashboard" : "Panel de artesana"}</button>}
-          {signedIn && role === "buyer" && <>
-            <button type="button" onClick={() => { close(); onBuyerOrders(); }} style={itemStyle}>{lang === "pt" ? "Ver onde está meu pedido" : lang === "en" ? "Track my order" : "Ver dónde está mi pedido"}</button>
-            <button type="button" onClick={close} style={itemStyle}>{lang === "pt" ? "Meu carrinho" : lang === "en" ? "My cart" : "Mi carrito"}</button>
-            <button type="button" onClick={() => { close(); onBuyerSettings(); }} style={itemStyle}>{lang === "pt" ? "Configurações da conta" : lang === "en" ? "Account settings" : "Configuración de la cuenta"}</button>
-          </>}
+          {signedIn && <button type="button" onClick={() => { close(); onOpenAccount(); }} style={itemStyle}>{role === "artisan" ? (lang === "pt" ? "Painel da artesã" : lang === "en" ? "Artisan dashboard" : "Panel de artesana") : (lang === "pt" ? "Minha conta" : lang === "en" ? "My account" : "Mi cuenta")}</button>}
           {signedIn && <div style={{ padding: "8px 16px 12px", color: C.primary, fontSize: 13, fontWeight: 700 }}>✓ {lang === "pt" ? "Inscrição enviada" : lang === "en" ? "Application sent" : "Inscripción enviada"}</div>}
-          {!signedIn && <button type="button" onClick={() => { close(); onCreateAccount(); }} style={itemStyle}
+          <button type="button" onClick={() => { close(); onCreateAccount(); }} style={itemStyle}
             onMouseEnter={e => { e.currentTarget.style.background = C.muted; e.currentTarget.style.color = C.fg; }}
             onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = C.fgDim; }}>
-            {lang === "pt" ? "Cadastrar-se" : lang === "en" ? "Sign up" : "Registrarse"}
-          </button>}
-          {!signedIn && <button type="button" onClick={() => { close(); onLogin(); }} style={itemStyle}
+            {lang === "pt" ? "Inscrever-se" : lang === "en" ? "Sign up" : "Registrarse"}
+          </button>
+          <button type="button" onClick={() => { close(); onLogin(); }} style={itemStyle}
             onMouseEnter={e => { e.currentTarget.style.background = C.muted; e.currentTarget.style.color = C.fg; }}
             onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = C.fgDim; }}>
             {lang === "pt" ? "Entrar" : lang === "en" ? "Log in" : "Iniciar sesión"}
-          </button>}
+          </button>
 
-          {!signedIn && <><div style={{ borderTop: `1px solid ${C.border}`, marginTop: 4 }} />
+          <div style={{ borderTop: `1px solid ${C.border}`, marginTop: 4 }} />
           <div style={headingStyle}>{lang === "pt" ? "Programa exclusivo" : lang === "en" ? "Exclusive program" : "Programa exclusivo"}</div>
-          <div style={{ padding: "4px 16px 9px", color: C.fgDim, fontSize: 11.5, lineHeight: 1.4 }}>{lang === "pt" ? "Somente para mulheres artesãs de Heliópolis." : lang === "en" ? "Only for women artisans from Heliópolis." : "Solo para mujeres artesanas de Heliópolis."}</div>
+          <div style={{ padding: "4px 16px 9px", color: C.fgDim, fontSize: 11.5, lineHeight: 1.4 }}>{lang === "pt" ? "Programa exclusivo para mulheres artesãs que moram em Heliópolis." : lang === "en" ? "Exclusive program for women artisans who live in Heliópolis." : "Programa exclusivo para mujeres artesanas que viven en Heliópolis."}</div>
           <button type="button" onClick={() => { close(); onArtisanSignup(); }} style={itemStyle}
             onMouseEnter={e => { e.currentTarget.style.background = C.muted; e.currentTarget.style.color = C.fg; }}
             onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = C.fgDim; }}>
-            {lang === "pt" ? "Cadastrar-se" : lang === "en" ? "Sign up" : "Registrarse"}
+            {lang === "pt" ? "Inscrever-se" : lang === "en" ? "Sign up" : "Registrarse"}
           </button>
-          {!signedIn && <button type="button" onClick={() => { close(); onLogin(); }} style={{ ...itemStyle, paddingBottom: 14 }}
+          <button type="button" onClick={() => { close(); onLogin(); }} style={{ ...itemStyle, paddingBottom: 14 }}
             onMouseEnter={e => { e.currentTarget.style.background = C.muted; e.currentTarget.style.color = C.fg; }}
             onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = C.fgDim; }}>
             {lang === "pt" ? "Entrar" : lang === "en" ? "Log in" : "Iniciar sesión"}
-          </button>}
-          </>}
+          </button>
         </div>
       )}
     </div>
@@ -600,7 +591,7 @@ function QuemSomosPage({ lang, onJoin }: { lang: Lang; onJoin: () => void }) {
   );
 }
 
-function ProdutosPageNova({ lang, onJoin, activeCategory, catMap, onCategoryChange }: { lang: Lang; onJoin: () => void; activeCategory: CatKey; catMap: Record<CatKey, string>; onCategoryChange: (category: CatKey) => void }) {
+function ProdutosPageNova({ lang, onJoin }: { lang: Lang; onJoin: () => void }) {
   const content = T.productsPage;
 
   return (
@@ -610,19 +601,11 @@ function ProdutosPageNova({ lang, onJoin, activeCategory, catMap, onCategoryChan
           <div style={{ color: C.primary, fontSize: 12, fontWeight: 800, letterSpacing: "0.14em" }}>{t(content.eyebrow, lang)}</div>
           <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: "clamp(2.5rem, 5vw, 4.3rem)", lineHeight: 1.04, margin: "14px 0 18px", letterSpacing: "-0.03em" }}>{t(content.title, lang)}</h1>
           <p style={{ color: C.fgDim, fontSize: 16, lineHeight: 1.8, maxWidth: 720, margin: 0 }}>{t(content.intro, lang)}</p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 28 }}>
-            {CAT_KEYS.map(key => (
-              <button key={key} type="button" onClick={() => onCategoryChange(key)}
-                style={{ padding: "8px 18px", borderRadius: 99, fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.18s", background: activeCategory === key ? C.primary : "transparent", color: activeCategory === key ? C.bg : C.fgDim, border: `1.5px solid ${activeCategory === key ? C.primary : C.border}` }}>
-                {catMap[key]}
-              </button>
-            ))}
-          </div>
         </div>
       </section>
       <section style={{ padding: "28px 24px 96px", background: C.bg }}>
         <div className="new-products-grid" style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 22 }}>
-          {(activeCategory === "all" ? PRODUCTS : PRODUCTS.filter(p => p.category === ({ all: "Todos", acessorios: "Acessórios", joias: "Joias", casa: "Casa", vestuario: "Vestuário", brinquedos: "Brinquedos" } as Record<CatKey, string>)[activeCategory])).map(p => (
+          {PRODUCTS.map(p => (
             <article key={p.id} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden" }}>
               <img src={p.image} alt={t(T.products.productNames[p.id], lang)} style={{ width: "100%", height: 260, objectFit: "cover", display: "block" }} />
               <div style={{ padding: 20 }}>
@@ -659,8 +642,10 @@ function ArtisanSignupPage({ lang, onSubmitted }: { lang: Lang; onSubmitted: () 
   const [form, setForm] = useState<Record<string, string>>({});
   const copy = {
     title: lang === "en" ? "Apply to the exclusive program" : lang === "es" ? "Inscríbete en el programa exclusivo" : "Inscreva-se no programa exclusivo",
-    submit: lang === "en" ? "Apply" : lang === "es" ? "Inscribirme" : "Inscrever",
-    success: lang === "en" ? "Application sent successfully! Please wait while we contact you and keep an eye on your email." : lang === "es" ? "¡Inscripción realizada con éxito! Espera nuestro contacto y revisa tu correo electrónico." : "Inscrição feita com sucesso! Aguarde entrarmos em contato e fique de olho em seu e-mail.",
+    eligibility: lang === "en" ? "This program is exclusively for women artisans who live in Heliópolis." : lang === "es" ? "Este programa es exclusivo para mujeres artesanas que viven en Heliópolis." : "Este programa é exclusivo para mulheres artesãs que moram em Heliópolis.",
+    confirmation: lang === "en" ? "I confirm that I am a woman artisan living in Heliópolis." : lang === "es" ? "Confirmo que soy una mujer artesana y vivo en Heliópolis." : "Confirmo que sou uma mulher artesã e moro em Heliópolis.",
+    submit: lang === "en" ? "Apply" : lang === "es" ? "Inscribirme" : "Inscrever-se",
+    success: lang === "en" ? "Application sent successfully! Our team will contact you soon using the information provided." : lang === "es" ? "¡Inscripción realizada con éxito! Nuestro equipo se pondrá en contacto contigo pronto con los datos informados." : "Inscrição enviada com sucesso! Nossa equipe entrará em contato em breve pelos dados informados.",
   };
   function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -673,6 +658,7 @@ function ArtisanSignupPage({ lang, onSubmitted }: { lang: Lang; onSubmitted: () 
         <div style={{ maxWidth: 540, margin: "0 auto" }}>
           <div style={{ color: C.primary, fontSize: 12, fontWeight: 800, letterSpacing: "0.14em" }}>{t(T.signup.fine, lang)}</div>
           <h1 style={{ fontFamily: "var(--font-fraunces)", fontSize: "clamp(2.2rem, 5vw, 3.6rem)", lineHeight: 1.05, margin: "14px 0 16px" }}>{copy.title}</h1>
+          <p style={{ color: C.fgDim, fontSize: 14, lineHeight: 1.6, margin: 0 }}>{copy.eligibility}</p>
           {submitted ? (
             <div style={{ marginTop: 28, padding: 28, borderRadius: 12, background: `${C.primary}12`, border: `1px solid ${C.primary}44`, color: C.fgDim, lineHeight: 1.7 }}>{copy.success}</div>
           ) : (
@@ -690,6 +676,10 @@ function ArtisanSignupPage({ lang, onSubmitted }: { lang: Lang; onSubmitted: () 
                   <input type="file" accept={accept} required={required} multiple={key === "artImages"} style={{ display: "block", width: "100%", marginTop: 6, padding: "10px", border: `1.5px solid ${C.border}`, borderRadius: 8, background: C.muted, color: C.fg, boxSizing: "border-box", fontFamily: "var(--font-nunito)" }} />
                 </label>
               ))}
+              <label style={{ display: "flex", alignItems: "flex-start", gap: 9, color: C.fgDim, fontSize: 13, lineHeight: 1.45, cursor: "pointer" }}>
+                <input type="checkbox" required style={{ marginTop: 3, accentColor: C.primary }} />
+                <span>{copy.confirmation}</span>
+              </label>
               <button type="submit" style={{ marginTop: 8, padding: 15, border: "none", borderRadius: 6, background: C.primary, color: C.bg, fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "var(--font-nunito)" }}>{copy.submit}</button>
             </form>
           )}
@@ -780,11 +770,6 @@ function LoginPage({ lang, onLogin, onCreateAccount }: { lang: Lang; onLogin: (r
 
 function AccountDashboard({ lang, role, onBack }: { lang: Lang; role: AccountRole; onBack: () => void }) {
   const artisan = role === "artisan";
-  const artisanNav = lang === "en"
-    ? ["Products", "Orders", "Messages", "Export", "Help"]
-    : lang === "es"
-      ? ["Productos", "Pedidos", "Mensajes", "Exportación", "Ayuda"]
-      : ["Produtos", "Pedidos", "Mensagens", "Exportação", "Ajuda"];
   const copy = artisan
     ? {
         eyebrow: lang === "en" ? "ARTISAN DASHBOARD" : lang === "es" ? "PANEL DE ARTESANA" : "PAINEL DA ARTESÃ",
@@ -796,21 +781,11 @@ function AccountDashboard({ lang, role, onBack }: { lang: Lang; role: AccountRol
         eyebrow: lang === "en" ? "BUYER ACCOUNT" : lang === "es" ? "CUENTA DE COMPRADOR" : "CONTA DE COMPRADOR",
         title: lang === "en" ? "Welcome to your space for Brazilian craft." : lang === "es" ? "Bienvenida a tu espacio de artesanía brasileña." : "Bem-vinda ao seu espaço de arte brasileira.",
         intro: lang === "en" ? "Discover products, follow orders and keep your account details in one place." : lang === "es" ? "Descubre productos, sigue pedidos y administra tus datos en un solo lugar." : "Descubra produtos, acompanhe pedidos e organize seus dados em um só lugar.",
-        cards: lang === "en" ? [["Track my order", "Follow delivery and see your purchase history."], ["My cart", "Review the products selected for your next purchase."], ["Account settings", "Edit your photo, language and personal information."]] : lang === "es" ? [["Seguir mi pedido", "Sigue la entrega y consulta tu historial de compras."], ["Mi carrito", "Revisa los productos seleccionados para tu próxima compra."], ["Configuración de la cuenta", "Edita tu foto, idioma e información personal."]] : [["Ver onde está meu pedido", "Acompanhe a entrega e veja seu histórico de compras."], ["Meu carrinho", "Revise os produtos escolhidos para sua próxima compra."], ["Configurações da conta", "Edite sua foto, idioma de origem e informações pessoais."]],
+        cards: lang === "en" ? [["My orders", "Follow delivery and see your purchase history."], ["Favorites", "Save pieces and artisans you want to visit again."], ["Payment cards", "Manage cards saved for secure checkout."], ["Profile settings", "Edit your photo, language and personal information."]] : lang === "es" ? [["Mis pedidos", "Sigue la entrega y consulta tu historial de compras."], ["Favoritos", "Guarda piezas y artesanas para volver cuando quieras."], ["Tarjetas de pago", "Gestiona las tarjetas guardadas para pagar con seguridad."], ["Configuración del perfil", "Edita tu foto, idioma e información personal."]] : [["Meus pedidos", "Acompanhe entregas e veja seu histórico de compras."], ["Favoritos", "Guarde peças e artesãs para visitar novamente."], ["Cartões para pagamento", "Gerencie os cartões salvos para comprar com segurança."], ["Configurações da conta", "Edite sua foto, idioma de origem e informações pessoais."]],
       };
 
   return (
     <main className="new-page">
-      {artisan && <header style={{ background: "#FBF5E9", borderBottom: `1px solid ${C.border}`, padding: "18px 24px" }}>
-        <div style={{ maxWidth: 1050, margin: "0 auto", display: "flex", alignItems: "center", gap: 22, flexWrap: "wrap" }}>
-          <strong style={{ color: C.primary, fontFamily: "var(--font-fraunces)", fontSize: 21 }}>Artesãs de Heliópolis</strong>
-          <nav aria-label="Navegação da artesã" style={{ display: "flex", gap: 18, flex: 1, flexWrap: "wrap" }}>
-            {artisanNav.map(item => <button key={item} type="button" style={{ border: "none", background: "none", color: C.fgDim, cursor: "pointer", fontFamily: "var(--font-nunito)", fontWeight: 600 }}>{item}</button>)}
-          </nav>
-          <span aria-label="Notificações" style={{ fontSize: 19 }}>🔔</span>
-          <strong style={{ fontSize: 13 }}>Maria das Graças</strong>
-        </div>
-      </header>}
       <section style={{ padding: "76px 24px 100px", background: C.bg, minHeight: "calc(100vh - 100px)" }}>
         <div style={{ maxWidth: 1050, margin: "0 auto" }}>
           <button type="button" onClick={onBack} style={{ border: "none", background: "none", color: C.primary, cursor: "pointer", padding: 0, fontWeight: 700, fontFamily: "var(--font-nunito)" }}>← {lang === "pt" ? "Voltar para a página inicial" : lang === "en" ? "Back to home" : "Volver al inicio"}</button>
@@ -833,10 +808,249 @@ function AccountDashboard({ lang, role, onBack }: { lang: Lang; role: AccountRol
 }
 
 // ─── app ─────────────────────────────────────────────────────────────────────
+type ArtisanDashboardSection = "overview" | "orders" | "messages" | "products" | "sales" | "export" | "help";
+type ArtisanProductStatus = "Publicado" | "Rascunho" | "Pausado";
+type ArtisanDashboardProduct = { id: string; sourceId: number; name: string; image: string; status: ArtisanProductStatus; quantity: number; price: string; category: string };
+type ArtisanUploadImage = { id: number; src: string; name: string };
+
+function ArtisanDashboard({ lang, onBack }: { lang: Lang; onBack: () => void }) {
+  const [section, setSection] = useState<ArtisanDashboardSection>("overview");
+  const [products, setProducts] = useState<ArtisanDashboardProduct[]>(() => PRODUCTS.map((product, index) => ({
+    id: `product-${product.id}`, sourceId: product.id, name: "", image: product.image,
+    status: index === 4 ? "Rascunho" : "Publicado", quantity: [4, 2, 6, 0, 3, 8][index], price: product.price, category: product.category,
+  })));
+  const [productModalOpen, setProductModalOpen] = useState(false);
+  const [orderOpen, setOrderOpen] = useState<string | null>(null);
+  const [messageOpen, setMessageOpen] = useState<number | null>(null);
+  const [toast, setToast] = useState("");
+  const [formError, setFormError] = useState("");
+  const [uploadImages, setUploadImages] = useState<ArtisanUploadImage[]>([]);
+  const [mainImage, setMainImage] = useState(0);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [newProduct, setNewProduct] = useState({ title: "", category: "Acessórios", price: "", quantity: "1", material: "", techniques: "", description: "", dimensions: "", productionTime: "" });
+  const [exportCosts, setExportCosts] = useState({ freight: "38", taxes: "12", documentation: "8" });
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(""), 3400);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+  const goTo = (target: ArtisanDashboardSection) => {
+    setSection(target);
+    window.setTimeout(() => document.getElementById("artisan-dashboard-content")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+  };
+  const openNewProduct = () => {
+    setEditingProductId(null);
+    setNewProduct({ title: "", category: "Acessórios", price: "", quantity: "1", material: "", techniques: "", description: "", dimensions: "", productionTime: "" });
+    setFormError("");
+    setProductModalOpen(true);
+  };
+  const openEditProduct = (product: ArtisanDashboardProduct) => {
+    const source = PRODUCTS.find(item => item.id === product.sourceId) || PRODUCTS[0];
+    setEditingProductId(product.id);
+    setNewProduct(previous => ({
+      ...previous,
+      title: product.name || t(T.products.productNames[source.id], lang),
+      category: product.category,
+      price: product.price.replace(/^R\$\s*/, ""),
+      quantity: String(product.quantity),
+    }));
+    setUploadImages([]);
+    setMainImage(0);
+    setFormError("");
+    setProductModalOpen(true);
+  };
+  const closeNewProduct = () => { setProductModalOpen(false); setEditingProductId(null); setUploadImages([]); setMainImage(0); setFormError(""); };
+  const updateNewProduct = (key: keyof typeof newProduct, value: string) => setNewProduct(previous => ({ ...previous, [key]: value }));
+  const onUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []).slice(0, 5 - uploadImages.length);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = () => setUploadImages(current => current.length < 5 ? [...current, { id: Date.now() + Math.random(), src: String(reader.result), name: file.name }] : current);
+      reader.readAsDataURL(file);
+    });
+    event.currentTarget.value = "";
+  };
+  const removeImage = (id: number) => {
+    setUploadImages(current => current.filter(image => image.id !== id));
+    setMainImage(index => Math.max(0, Math.min(index, uploadImages.length - 2)));
+  };
+  const moveImage = (imageIndex: number, direction: -1 | 1) => {
+    const next = imageIndex + direction;
+    if (next < 0 || next >= uploadImages.length) return;
+    setUploadImages(current => {
+      const copy = [...current];
+      [copy[imageIndex], copy[next]] = [copy[next], copy[imageIndex]];
+      return copy;
+    });
+    setMainImage(index => index === imageIndex ? next : index === next ? imageIndex : index);
+  };
+  const saveNewProduct = (status: ArtisanProductStatus) => {
+    if (!newProduct.title.trim()) { setFormError("Dê um nome para a peça antes de salvar."); return; }
+    if (editingProductId) {
+      setProducts(current => current.map(product => product.id === editingProductId ? {
+        ...product,
+        name: newProduct.title.trim(),
+        image: uploadImages[mainImage]?.src || product.image,
+        status,
+        quantity: Number(newProduct.quantity) || 0,
+        price: newProduct.price ? `R$ ${newProduct.price}` : "R$ 0",
+        category: newProduct.category,
+      } : product));
+      closeNewProduct();
+      setNewProduct({ title: "", category: "Acessórios", price: "", quantity: "1", material: "", techniques: "", description: "", dimensions: "", productionTime: "" });
+      setToast(status === "Publicado" ? "Produto atualizado e publicado!" : "Alterações salvas como rascunho.");
+      return;
+    }
+    const fallback = PRODUCTS[products.length % PRODUCTS.length];
+    setProducts(current => [{
+      id: `product-${Date.now()}`, sourceId: fallback.id, name: newProduct.title.trim(),
+      image: uploadImages[mainImage]?.src || fallback.image, status, quantity: Number(newProduct.quantity) || 0,
+      price: newProduct.price ? `R$ ${newProduct.price}` : "R$ 0", category: newProduct.category,
+    }, ...current]);
+    closeNewProduct();
+    setNewProduct({ title: "", category: "Acessórios", price: "", quantity: "1", material: "", techniques: "", description: "", dimensions: "", productionTime: "" });
+    setToast(status === "Publicado" ? "Produto publicado com sucesso!" : "Rascunho salvo. Você pode completar depois.");
+    goTo("products");
+  };
+  const stats = [
+    { label: "Produtos ativos", value: "12", detail: "+2 este mês", color: C.primary, target: "products" as ArtisanDashboardSection, icon: "✦" },
+    { label: "Pedidos", value: "4", detail: "2 aguardando envio", color: C.accent, target: "orders" as ArtisanDashboardSection, icon: "▣" },
+    { label: "Vendas no mês", value: "R$ 1.240", detail: "+18% que no mês passado", color: C.purple, target: "sales" as ArtisanDashboardSection, icon: "↗" },
+    { label: "Mensagens", value: "2", detail: "de compradores", color: C.yellow, target: "messages" as ArtisanDashboardSection, icon: "♡" },
+  ];
+  const orders = [
+    { id: "#HLP-2408", product: "Cesta Trançada Sol", buyer: "Ana Clara", date: "Hoje, 10:42", value: "R$ 85", status: "Pronto para enviar", color: C.primary },
+    { id: "#HLP-2397", product: "Colar Raízes", buyer: "Camila M.", date: "Ontem, 16:20", value: "R$ 120", status: "Em produção", color: C.yellow },
+    { id: "#HLP-2379", product: "Boneca Abayomi", buyer: "Sofia R.", date: "12 jun, 09:10", value: "R$ 95", status: "Entregue", color: C.blue },
+    { id: "#HLP-2364", product: "Kit Casa", buyer: "Marina L.", date: "10 jun, 14:05", value: "R$ 210", status: "Entregue", color: C.blue },
+  ];
+  const messages = [
+    { id: 1, name: "Camila M.", subject: "Dúvida sobre o prazo", text: "Olá, Maria! Você consegue enviar o Colar Raízes ainda esta semana?", time: "Hoje, 09:30", unread: true },
+    { id: 2, name: "Ana Clara", subject: "Pedido #HLP-2408", text: "Estou ansiosa para receber minha cesta. Obrigada pelo cuidado!", time: "Ontem, 18:12", unread: true },
+    { id: 3, name: "Equipe Artesãs", subject: "Sua vitrine está linda", text: "Uma dica: fotos com luz natural recebem mais visitas.", time: "11 jun", unread: false },
+  ];
+  const sectionTitle: Record<ArtisanDashboardSection, string> = { overview: "Visão geral", orders: "Pedidos", messages: "Mensagens", products: "Meus produtos", sales: "Vendas", export: "Exportação", help: "Ajuda e suporte" };
+  const statusStyle = (status: ArtisanProductStatus) => status === "Publicado" ? { background: `${C.primary}18`, color: C.primary } : status === "Rascunho" ? { background: `${C.yellow}25`, color: "#896D0C" } : { background: `${C.fgFaint}`, color: C.fgDim };
+
+  const productList = (
+    <div className="artisan-product-grid">
+      {products.map(product => {
+        const source = PRODUCTS.find(item => item.id === product.sourceId) || PRODUCTS[0];
+        return <article key={product.id} className="artisan-product-card"><div style={{ position: "relative" }}><img src={product.image || source.image} alt={product.name || t(T.products.productNames[source.id], lang)} /><span style={{ ...statusStyle(product.status), position: "absolute", top: 10, left: 10, borderRadius: 99, padding: "5px 9px", fontSize: 10.5, fontWeight: 800 }}>{product.status}</span></div><div style={{ padding: 15 }}><div style={{ color: C.primary, fontSize: 10.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase" }}>{product.category}</div><h3 style={{ fontFamily: "var(--font-fraunces)", fontSize: 18, margin: "5px 0 4px" }}>{product.name || t(T.products.productNames[source.id], lang)}</h3><div style={{ display: "flex", justifyContent: "space-between", gap: 8, color: C.fgDim, fontSize: 12.5 }}><span>{product.price}</span><span>{product.quantity} em estoque</span></div><button type="button" onClick={() => openEditProduct(product)} style={{ marginTop: 13, width: "100%", padding: 8, border: `1px solid ${C.border}`, borderRadius: 6, background: "transparent", color: C.fgDim, cursor: "pointer", fontWeight: 700, fontFamily: "var(--font-nunito)" }}>Editar produto</button></div></article>;
+      })}
+    </div>
+  );
+  const orderRows = (items = orders) => items.map(order => <button type="button" key={order.id} onClick={() => setOrderOpen(order.id)} className="artisan-order-row"><span className="artisan-order-mark" style={{ background: `${order.color}22`, color: order.color }}>▣</span><span className="artisan-order-info"><strong>{order.product}</strong><small>{order.id} · {order.buyer} · {order.date}</small></span><span className="artisan-order-value">{order.value}</span><span className="artisan-status-pill" style={{ color: order.color, background: `${order.color}18` }}>{order.status}</span><span className="artisan-chevron">→</span></button>);
+  const messageRows = (items = messages) => items.map(message => <button type="button" key={message.id} onClick={() => setMessageOpen(message.id)} className="artisan-message-row"><span className={`artisan-message-avatar ${message.unread ? "unread" : ""}`}>{message.name.split(" ").map(item => item[0]).join("").slice(0, 2)}</span><span className="artisan-order-info"><strong>{message.subject}{message.unread && <i />}</strong><small>{message.name} · {message.text}</small></span><span className="artisan-order-date">{message.time}</span><span className="artisan-chevron">→</span></button>);
+
+  return <div className="artisan-dashboard-shell">
+    <header className="artisan-dashboard-header"><button type="button" onClick={onBack} aria-label="Voltar para o site" className="artisan-brand-button"><img src={logo} alt="Artesãs de Heliópolis" className="artisan-dashboard-logo" /></button><div className="artisan-header-context"><span>Seu ateliê, seu ritmo</span><strong>Área da artesã</strong></div><div className="artisan-header-actions"><button type="button" onClick={() => goTo("help")} aria-label="Ajuda" className="artisan-header-icon">?</button><button type="button" onClick={onBack} className="artisan-site-link">Ver vitrine <span>↗</span></button><button type="button" onClick={onBack} className="artisan-avatar" aria-label="Abrir perfil de Maria das Graças">MG</button></div></header>
+    <div className="artisan-dashboard-layout">
+      <aside className="artisan-sidebar"><div className="artisan-sidebar-greeting"><span>Bem-vinda de volta,</span><strong>Maria!</strong><small>Vamos fazer seu trabalho<br />chegar mais longe.</small></div><nav aria-label="Navegação da área da artesã">{([["overview", "Visão geral", "⌂"], ["orders", "Pedidos", "▣"], ["messages", "Mensagens", "♡"], ["products", "Minha vitrine", "✦"], ["sales", "Vendas", "↗"], ["export", "Alcançar o mundo", "◎"]] as [ArtisanDashboardSection, string, string][]).map(([key, label, icon]) => <button type="button" key={key} onClick={() => goTo(key)} className={`artisan-side-link ${section === key ? "is-active" : ""}`}><span>{icon}</span>{label}{key === "messages" && <b>2</b>}</button>)}</nav><div className="artisan-sidebar-bottom"><button type="button" onClick={() => goTo("help")} className="artisan-side-link"><span>?</span>Ajuda e suporte</button><button type="button" onClick={onBack} className="artisan-side-link"><span>↪</span>Sair da conta</button></div></aside>
+      <main id="artisan-dashboard-content" className="artisan-dashboard-content"><div className="artisan-mobile-nav">{(["overview", "orders", "messages", "products"] as ArtisanDashboardSection[]).map(key => <button type="button" key={key} onClick={() => goTo(key)} className={section === key ? "is-active" : ""}>{sectionTitle[key]}</button>)}</div>
+        {section === "overview" && <><div className="artisan-welcome-row"><div><span className="artisan-eyebrow">UM BOM DIA PARA CRIAR</span><h1>Olá, Maria! <span>✦</span></h1><p>Aqui você cuida da sua vitrine, conversa com clientes e prepara suas peças para alcançar novos lugares.</p></div><button type="button" onClick={openNewProduct} className="artisan-primary-button">＋ Adicionar produto</button></div><div className="artisan-purpose-note"><span>✦</span><div><strong>Seu feito à mão pode cruzar fronteiras.</strong><p>Conte a história da sua peça. A gente ajuda com idioma, frete e os próximos passos.</p></div><button type="button" onClick={() => goTo("export")}>Conhecer o caminho →</button></div><div className="artisan-stat-grid">{stats.map(stat => <button type="button" key={stat.label} onClick={() => goTo(stat.target)} className="artisan-stat-card" style={{ "--stat-color": stat.color } as React.CSSProperties}><span className="artisan-stat-icon">{stat.icon}</span><span className="artisan-stat-label">{stat.label}</span><strong>{stat.value}</strong><small>{stat.detail}<span> →</span></small></button>)}</div><div className="artisan-overview-grid"><section className="artisan-panel artisan-shortcuts"><div className="artisan-panel-heading"><div><span className="artisan-eyebrow">COMECE POR AQUI</span><h2>Atalhos rápidos</h2></div></div><div className="artisan-shortcut-grid"><button type="button" onClick={openNewProduct}><span style={{ background: `${C.primary}20`, color: C.primary }}>＋</span><strong>Adicionar produto</strong><small>Coloque uma nova peça na vitrine</small></button><button type="button" onClick={() => goTo("orders")}><span style={{ background: `${C.accent}20`, color: C.accent }}>▣</span><strong>Ver pedidos</strong><small>2 pedidos aguardando ação</small></button><button type="button" onClick={() => goTo("export")}><span style={{ background: `${C.purple}20`, color: C.purple }}>◎</span><strong>Preparar exportação</strong><small>Avance seu catálogo internacional</small></button><button type="button" onClick={() => goTo("help")}><span style={{ background: `${C.yellow}25`, color: "#896D0C" }}>?</span><strong>Aprender e melhorar</strong><small>Dicas para vender mais</small></button></div></section><section className="artisan-panel artisan-export-mini"><div className="artisan-panel-heading"><div><span className="artisan-eyebrow">NOVO CAMINHO</span><h2>Venda para o mundo</h2></div><button type="button" onClick={() => goTo("export")}>Ver tudo →</button></div><p>Seu catálogo já está <strong>65%</strong> pronto para alcançar compradores de fora do Brasil.</p><div className="artisan-progress"><span style={{ width: "65%" }} /></div><div className="artisan-export-steps"><span className="done">✓ Fotos</span><span className="done">✓ Preços</span><span>○ Descrições</span></div></section></div><section className="artisan-panel"><div className="artisan-panel-heading"><div><span className="artisan-eyebrow">ACOMPANHE DE PERTO</span><h2>Pedidos recentes</h2></div><button type="button" onClick={() => goTo("orders")}>Ver todos →</button></div>{orderRows(orders.slice(0, 3))}</section><section className="artisan-panel"><div className="artisan-panel-heading"><div><span className="artisan-eyebrow">CAIXA DE ENTRADA</span><h2>Mensagens recentes</h2></div><button type="button" onClick={() => goTo("messages")}>Ver todas →</button></div>{messageRows(messages.slice(0, 2))}</section></>}
+        {section === "orders" && <section className="artisan-section-page"><div className="artisan-page-heading"><div><span className="artisan-eyebrow">ACOMPANHE SUAS VENDAS</span><h1>Pedidos</h1><p>Veja o que precisa da sua atenção e mantenha suas clientes informadas.</p></div><span className="artisan-page-count">4 pedidos no mês</span></div><div className="artisan-panel">{orderRows()}</div></section>}
+        {section === "messages" && <section className="artisan-section-page"><div className="artisan-page-heading"><div><span className="artisan-eyebrow">CONVERSE COM QUEM COMPRA</span><h1>Mensagens</h1><p>Uma resposta atenciosa também faz parte do seu trabalho artesanal.</p></div><span className="artisan-page-count">2 não lidas</span></div><div className="artisan-panel artisan-messages-list">{messageRows()}</div></section>}
+        {section === "products" && <section className="artisan-section-page"><div className="artisan-page-heading"><div><span className="artisan-eyebrow">SUA VITRINE</span><h1>Meus produtos</h1><p>Cuide da apresentação das peças que carregam sua história.</p></div><button type="button" onClick={openNewProduct} className="artisan-primary-button">＋ Adicionar produto</button></div>{productList}</section>}
+        {section === "sales" && <section className="artisan-section-page"><div className="artisan-page-heading"><div><span className="artisan-eyebrow">SEU RESULTADO</span><h1>Vendas</h1><p>Um olhar simples para você tomar decisões com mais confiança.</p></div><span className="artisan-page-count">Junho de 2026</span></div><div className="artisan-sales-grid"><section className="artisan-panel artisan-chart-panel"><div className="artisan-panel-heading"><div><span className="artisan-eyebrow">RECEITA</span><h2>R$ 1.240</h2></div><span className="artisan-growth">↗ 18%</span></div><div className="artisan-chart"><div className="artisan-chart-y"><span>600</span><span>400</span><span>200</span><span>0</span></div><div className="artisan-bars">{[220, 310, 180, 420, 350, 510, 390].map((height, index) => <div className="artisan-bar-column" key={index}><div className="artisan-bar" style={{ height: `${height / 2.2}px`, background: index === 5 ? C.primary : `${C.primary}55` }} title={`R$ ${height}`} /><small>{["S", "T", "Q", "Q", "S", "S", "D"][index]}</small></div>)}</div></div></section><div className="artisan-sales-summary"><div className="artisan-panel"><span className="artisan-eyebrow">PEDIDO MÉDIO</span><strong>R$ 310</strong><small>+12% este mês</small></div><div className="artisan-panel"><span className="artisan-eyebrow">PEÇA MAIS VENDIDA</span><strong>Cesta Trançada</strong><small>3 unidades vendidas</small></div></div></div></section>}
+        {section === "export" && <section className="artisan-section-page"><div className="artisan-page-heading"><div><span className="artisan-eyebrow">NOVOS MERCADOS</span><h1>Exportação</h1><p>Prepare seus produtos para encontrar pessoas que valorizam o feito à mão no mundo todo.</p></div></div><div className="artisan-export-layout"><section className="artisan-panel artisan-export-progress"><div className="artisan-panel-heading"><div><span className="artisan-eyebrow">SEU PROGRESSO</span><h2>Catálogo internacional</h2></div><strong>65%</strong></div><div className="artisan-progress large"><span style={{ width: "65%" }} /></div><div className="artisan-export-card-grid"><button type="button" onClick={() => goTo("products")}><span className="done">✓</span><strong>Fotos dos produtos</strong><small>12 de 12 concluídas</small></button><button type="button" onClick={() => setToast("Preços internacionais disponíveis em breve.")}><span className="done">✓</span><strong>Preços e medidas</strong><small>Prontos para revisão</small></button><button type="button" onClick={openNewProduct}><span className="todo">2</span><strong>Descrição em inglês e espanhol</strong><small>2 produtos precisam de texto</small></button><button type="button" onClick={() => setToast("Nossa equipe vai revisar seu catálogo com você.")}><span className="todo">→</span><strong>Revisão da equipe</strong><small>Disponível após completar</small></button></div><div className="artisan-language-strip"><strong>Vitrine para o mundo</strong><span>PT</span><span>EN</span><span>ES</span><small>Você escolhe os idiomas; a equipe ajuda com a tradução.</small></div></section></div><section className="artisan-export-tools"><div className="artisan-panel artisan-cost-card"><div className="artisan-panel-heading"><div><span className="artisan-eyebrow">FAÇA UMA CONTA RÁPIDA</span><h2>Quanto custa enviar?</h2></div><span className="artisan-cost-total">R$ {Number(exportCosts.freight || 0) + Number(exportCosts.taxes || 0) + Number(exportCosts.documentation || 0)}</span></div><p>Uma estimativa para você formar o preço com tranquilidade. Os valores finais podem variar.</p><div className="artisan-cost-fields"><label>Frete <span>R$</span><input type="number" min="0" value={exportCosts.freight} onChange={event => setExportCosts(current => ({ ...current, freight: event.target.value }))} /></label><label>Taxas <span>R$</span><input type="number" min="0" value={exportCosts.taxes} onChange={event => setExportCosts(current => ({ ...current, taxes: event.target.value }))} /></label><label>Documentação <span>R$</span><input type="number" min="0" value={exportCosts.documentation} onChange={event => setExportCosts(current => ({ ...current, documentation: event.target.value }))} /></label></div></div><div className="artisan-panel artisan-journey-card"><span className="artisan-eyebrow">PASSO A PASSO</span><h2>Do ateliê até a nova casa</h2><ol><li><b>01</b><span>Escolha o destino e confirme o endereço.</span></li><li><b>02</b><span>Separe nota, declaração e medidas da embalagem.</span></li><li><b>03</b><span>A equipe calcula frete e orienta a alfândega.</span></li><li><b>04</b><span>Acompanhe o envio até a entrega.</span></li></ol><button type="button" onClick={() => setToast("Guia de alfândega enviado para suas mensagens.")} className="artisan-text-button">Quero orientação completa →</button></div></section></section>}
+        {section === "help" && <section className="artisan-section-page"><div className="artisan-page-heading"><div><span className="artisan-eyebrow">ESTAMOS COM VOCÊ</span><h1>Ajuda e suporte</h1><p>Conte com a gente para cuidar da sua vitrine e fazer seu trabalho chegar mais longe.</p></div></div><div className="artisan-help-grid"><button type="button" onClick={() => setToast("Guia de fotos aberto — use luz natural e mostre os detalhes da peça.")} className="artisan-help-card"><span>▣</span><strong>Como fotografar minhas peças?</strong><small>Veja dicas simples para fotos que valorizam seu trabalho.</small><b>Ver guia →</b></button><button type="button" onClick={() => setToast("Perguntas frequentes disponíveis em breve.")} className="artisan-help-card"><span>?</span><strong>Perguntas frequentes</strong><small>Respostas para as dúvidas mais comuns das artesãs.</small><b>Consultar FAQ →</b></button></div></section>}
+      </main>
+    </div>
+    {orderOpen && <div className="artisan-dialog-backdrop" role="presentation" onClick={() => setOrderOpen(null)}><div className="artisan-dialog artisan-small-dialog" role="dialog" aria-modal="true" onClick={event => event.stopPropagation()}><button type="button" className="artisan-dialog-close" onClick={() => setOrderOpen(null)}>×</button>{(() => { const order = orders.find(item => item.id === orderOpen)!; return <><span className="artisan-eyebrow">DETALHES DO PEDIDO</span><h2>{order.product}</h2><p><strong>{order.id}</strong> · {order.buyer}</p><div className="artisan-dialog-detail"><span>Status</span><strong style={{ color: order.color }}>{order.status}</strong></div><div className="artisan-dialog-detail"><span>Valor</span><strong>{order.value}</strong></div><button type="button" className="artisan-primary-button" onClick={() => { setOrderOpen(null); setToast("Pedido marcado para acompanhamento."); }}>Entendi</button></>; })()}</div></div>}
+    {messageOpen && <div className="artisan-dialog-backdrop" role="presentation" onClick={() => setMessageOpen(null)}><div className="artisan-dialog artisan-small-dialog" role="dialog" aria-modal="true" onClick={event => event.stopPropagation()}><button type="button" className="artisan-dialog-close" onClick={() => setMessageOpen(null)}>×</button>{(() => { const message = messages.find(item => item.id === messageOpen)!; return <><span className="artisan-eyebrow">MENSAGEM DE {message.name.toUpperCase()}</span><h2>{message.subject}</h2><p style={{ lineHeight: 1.7 }}>{message.text}</p><small style={{ color: C.fgFaint }}>{message.time}</small><button type="button" className="artisan-primary-button" onClick={() => { setMessageOpen(null); setToast("Resposta pronta para você enviar pelo chat."); }}>Responder</button></>; })()}</div></div>}
+    {productModalOpen && <div className="artisan-dialog-backdrop" role="presentation" onClick={closeNewProduct}><div className="artisan-dialog artisan-product-dialog" role="dialog" aria-modal="true" onClick={event => event.stopPropagation()}><div className="artisan-dialog-heading"><div><span className="artisan-eyebrow">{editingProductId ? "EDITAR PEÇA" : "NOVA PEÇA"}</span><h2>{editingProductId ? "Editar produto" : "Adicionar produto"}</h2><p>Compartilhe os detalhes que tornam seu trabalho especial.</p></div><button type="button" className="artisan-dialog-close" onClick={closeNewProduct}>×</button></div><form onSubmit={event => { event.preventDefault(); saveNewProduct("Publicado"); }}><div className="artisan-upload-area"><div><strong>Fotos do produto</strong><small>Até 5 imagens · a primeira será a principal</small></div><label className="artisan-upload-button">＋ Escolher imagens<input type="file" accept="image/*" multiple onChange={onUpload} disabled={uploadImages.length >= 5} /></label></div>{uploadImages.length > 0 && <div className="artisan-upload-previews">{uploadImages.map((image, index) => <div key={image.id} className={`artisan-upload-preview ${index === mainImage ? "is-main" : ""}`}><img src={image.src} alt={image.name} /><div><button type="button" onClick={() => setMainImage(index)}>{index === mainImage ? "★ Principal" : "☆ Principal"}</button><button type="button" onClick={() => moveImage(index, -1)} disabled={index === 0}>←</button><button type="button" onClick={() => moveImage(index, 1)} disabled={index === uploadImages.length - 1}>→</button><button type="button" onClick={() => removeImage(image.id)}>Remover</button></div></div>)}</div>}<div className="artisan-form-grid"><label>Nome do produto<input value={newProduct.title} onChange={event => updateNewProduct("title", event.target.value)} placeholder="Ex.: Cesta Trançada Sol" /></label><label>Categoria<select value={newProduct.category} onChange={event => updateNewProduct("category", event.target.value)}><option>Acessórios</option><option>Joias</option><option>Casa</option><option>Brinquedos</option><option>Vestuário</option></select></label><label>Preço (R$)<input type="number" min="0" value={newProduct.price} onChange={event => updateNewProduct("price", event.target.value)} placeholder="85" /></label><label>Quantidade disponível<input type="number" min="0" value={newProduct.quantity} onChange={event => updateNewProduct("quantity", event.target.value)} /></label><label>Materiais<input value={newProduct.material} onChange={event => updateNewProduct("material", event.target.value)} placeholder="Ex.: palha, linha de algodão" /></label><label>Técnicas usadas<input value={newProduct.techniques} onChange={event => updateNewProduct("techniques", event.target.value)} placeholder="Ex.: trançado, bordado" /></label><label>Dimensões<input value={newProduct.dimensions} onChange={event => updateNewProduct("dimensions", event.target.value)} placeholder="Ex.: 30 × 20 cm" /></label><label>Tempo de produção<input value={newProduct.productionTime} onChange={event => updateNewProduct("productionTime", event.target.value)} placeholder="Ex.: 3 dias" /></label><label className="artisan-form-full">Descrição<textarea rows={3} value={newProduct.description} onChange={event => updateNewProduct("description", event.target.value)} placeholder="Conte a história e o cuidado por trás da peça." /></label></div>{formError && <p className="artisan-form-error">{formError}</p>}<div className="artisan-dialog-actions"><button type="button" onClick={() => saveNewProduct("Rascunho")} className="artisan-outline-button">Salvar rascunho</button><button type="submit" className="artisan-primary-button">{editingProductId ? "Salvar alterações" : "Publicar produto"}</button></div></form></div></div>}
+    {toast && <div className="artisan-toast" role="status">{toast}</div>}
+    <style>{`
+      .artisan-dashboard-shell { min-height: calc(100vh - 2px); background: ${C.bg}; color: ${C.fg}; }
+      .artisan-dashboard-header { height: 76px; padding: 0 clamp(18px, 4vw, 54px); display: flex; align-items: center; gap: 26px; background: #FBF5E9; border-bottom: 1px solid ${C.border}; box-sizing: border-box; }
+      .artisan-dashboard-logo { width: 190px; height: 62px; object-fit: contain; object-position: left center; display: block; }
+      .artisan-header-context { border-left: 1px solid ${C.border}; padding-left: 25px; display: flex; flex-direction: column; gap: 2px; font-size: 11px; color: ${C.fgFaint}; } .artisan-header-context strong { font-size: 14px; color: ${C.fg}; }
+      .artisan-header-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; } .artisan-header-icon, .artisan-avatar { width: 36px; height: 36px; border: 1px solid ${C.border}; border-radius: 50%; background: transparent; color: ${C.fgDim}; cursor: pointer; font-weight: 800; } .artisan-avatar { background: ${C.primary}; color: ${C.card}; border-color: ${C.primary}; font-size: 11px; } .artisan-site-link { border: 0; background: none; color: ${C.fgDim}; font: 600 12px var(--font-nunito); cursor: pointer; }
+      .artisan-dashboard-layout { display: flex; width: 100%; max-width: none; margin: 0; } .artisan-sidebar { width: 230px; flex-shrink: 0; padding: 32px 18px 24px; min-height: calc(100vh - 76px); box-sizing: border-box; background: #F2E6D5; border-right: 1px solid ${C.border}; display: flex; flex-direction: column; } .artisan-sidebar-greeting { padding: 0 14px 26px; display: flex; flex-direction: column; gap: 4px; color: ${C.fgDim}; font-size: 12px; } .artisan-sidebar-greeting strong { font: 700 25px var(--font-fraunces); color: ${C.fg}; }
+      .artisan-side-link { display: flex; align-items: center; width: 100%; gap: 12px; border: 0; border-radius: 7px; padding: 12px 13px; margin: 2px 0; color: ${C.fgDim}; background: transparent; text-align: left; cursor: pointer; font: 600 13px var(--font-nunito); } .artisan-side-link span { width: 20px; color: ${C.fgFaint}; text-align: center; font-size: 16px; } .artisan-side-link b { margin-left: auto; min-width: 20px; padding: 3px 5px; border-radius: 20px; background: ${C.accent}; color: ${C.card}; text-align: center; font-size: 10px; } .artisan-side-link:hover, .artisan-side-link.is-active { background: ${C.card}; color: ${C.primary}; box-shadow: 0 3px 12px rgba(58,41,37,.05); } .artisan-side-link.is-active span { color: ${C.primary}; } .artisan-sidebar-bottom { margin-top: auto; border-top: 1px solid ${C.border}; padding-top: 15px; }
+      .artisan-dashboard-content { min-width: 0; flex: 1; padding: clamp(26px, 4vw, 54px) clamp(20px, 4vw, 58px) 80px; } .artisan-mobile-nav { display: none; } .artisan-welcome-row, .artisan-page-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 32px; } .artisan-eyebrow { color: ${C.primary}; display: block; font-size: 10.5px; font-weight: 800; letter-spacing: .14em; } .artisan-welcome-row h1, .artisan-page-heading h1 { margin: 8px 0 7px; font: 700 clamp(2rem, 3.5vw, 3.25rem)/1.05 var(--font-fraunces); letter-spacing: -.025em; } .artisan-welcome-row h1 span { color: ${C.yellow}; font-size: .6em; vertical-align: top; } .artisan-welcome-row p, .artisan-page-heading p { max-width: 580px; margin: 0; color: ${C.fgDim}; font-size: 14px; line-height: 1.6; }
+      .artisan-primary-button, .artisan-outline-button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 6px; padding: 12px 17px; font: 700 13px var(--font-nunito); cursor: pointer; white-space: nowrap; } .artisan-primary-button { background: ${C.primary}; border: 1px solid ${C.primary}; color: ${C.card}; box-shadow: 0 5px 16px ${C.primary}2e; } .artisan-outline-button { background: transparent; border: 1px solid ${C.primary}; color: ${C.primary}; } .artisan-primary-button:hover, .artisan-outline-button:hover { transform: translateY(-1px); }
+      .artisan-stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; margin-bottom: 23px; } .artisan-stat-card { --stat-color: ${C.primary}; position: relative; padding: 18px; min-height: 142px; border: 1px solid ${C.border}; border-radius: 10px; background: ${C.card}; color: ${C.fg}; text-align: left; cursor: pointer; transition: .18s; } .artisan-stat-card:hover { transform: translateY(-3px); border-color: var(--stat-color); box-shadow: 0 10px 24px rgba(58,41,37,.08); } .artisan-stat-icon { display: grid; place-items: center; width: 29px; height: 29px; margin-bottom: 13px; border-radius: 7px; color: var(--stat-color); background: color-mix(in srgb, var(--stat-color) 13%, transparent); font-size: 17px; } .artisan-stat-label, .artisan-stat-card small { display: block; color: ${C.fgDim}; font-size: 12px; } .artisan-stat-card strong { display: block; margin: 4px 0 7px; color: ${C.fg}; font: 700 27px var(--font-fraunces); } .artisan-stat-card small span { color: var(--stat-color); font-weight: 800; }
+      .artisan-overview-grid { display: grid; grid-template-columns: 1.35fr .95fr; gap: 18px; margin-bottom: 18px; } .artisan-panel { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 10px; padding: 22px; margin-bottom: 18px; } .artisan-panel-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 19px; } .artisan-panel-heading h2 { margin: 5px 0 0; font: 700 22px var(--font-fraunces); } .artisan-panel-heading button { border: 0; background: none; color: ${C.primary}; padding: 4px 0; font: 700 12px var(--font-nunito); cursor: pointer; }
+      .artisan-shortcut-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; } .artisan-shortcut-grid button { display: grid; grid-template-columns: 35px 1fr; grid-template-rows: auto auto; column-gap: 10px; padding: 12px; border: 1px solid ${C.border}; border-radius: 8px; background: ${C.bg}; color: ${C.fg}; text-align: left; cursor: pointer; } .artisan-shortcut-grid button:hover { border-color: ${C.primary}; } .artisan-shortcut-grid button > span { grid-row: 1 / span 2; display: grid; place-items: center; width: 35px; height: 35px; border-radius: 7px; font-size: 20px; } .artisan-shortcut-grid strong { font-size: 12.5px; align-self: end; } .artisan-shortcut-grid small { margin-top: 3px; color: ${C.fgDim}; font-size: 10.5px; line-height: 1.3; }
+      .artisan-export-mini { background: linear-gradient(135deg, ${C.card}, #F2E5D6); } .artisan-export-mini p { margin: 0 0 17px; color: ${C.fgDim}; font-size: 13px; line-height: 1.6; } .artisan-export-steps { display: flex; flex-wrap: wrap; gap: 7px 12px; margin-top: 11px; color: ${C.fgDim}; font-size: 11px; } .artisan-export-steps .done { color: ${C.primary}; } .artisan-progress { height: 8px; border-radius: 10px; overflow: hidden; background: ${C.border}; } .artisan-progress span { display: block; height: 100%; border-radius: inherit; background: ${C.primary}; } .artisan-progress.large { height: 12px; margin: 21px 0 27px; }
+      .artisan-order-row, .artisan-message-row { display: flex; align-items: center; width: 100%; gap: 14px; padding: 13px 0; border: 0; border-top: 1px solid ${C.border}; background: none; color: ${C.fg}; text-align: left; cursor: pointer; } .artisan-order-row:hover, .artisan-message-row:hover { background: ${C.bg}; } .artisan-order-mark { display: grid; place-items: center; width: 34px; height: 34px; flex-shrink: 0; border-radius: 7px; } .artisan-order-info { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px; } .artisan-order-info strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; } .artisan-order-info small, .artisan-order-date { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: ${C.fgDim}; font-size: 11px; } .artisan-order-date { width: 105px; } .artisan-order-value { width: 70px; font-weight: 800; font-size: 12px; } .artisan-status-pill { border-radius: 99px; padding: 5px 8px; font-size: 10px; font-weight: 800; white-space: nowrap; } .artisan-chevron { color: ${C.primary}; font-size: 17px; } .artisan-message-avatar { display: grid; place-items: center; width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%; background: ${C.muted}; color: ${C.fgDim}; font-size: 10px; font-weight: 800; } .artisan-message-avatar.unread { background: ${C.primary}20; color: ${C.primary}; } .artisan-message-row .artisan-order-info strong { display: flex; align-items: center; gap: 7px; } .artisan-message-row i { width: 6px; height: 6px; border-radius: 50%; background: ${C.accent}; }
+      .artisan-section-page { max-width: 1060px; } .artisan-page-count { padding: 8px 11px; border-radius: 99px; background: ${C.muted}; color: ${C.fgDim}; font-size: 11px; font-weight: 700; white-space: nowrap; } .artisan-product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; } .artisan-product-card { overflow: hidden; border: 1px solid ${C.border}; border-radius: 10px; background: ${C.card}; } .artisan-product-card img { display: block; width: 100%; height: 165px; object-fit: cover; } .artisan-product-card h3 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .artisan-sales-grid, .artisan-export-layout { display: grid; grid-template-columns: 1.4fr .75fr; gap: 18px; } .artisan-chart-panel h2 { margin: 5px 0 0; font: 700 28px var(--font-fraunces); } .artisan-growth { padding: 5px 8px; border-radius: 99px; background: ${C.primary}18; color: ${C.primary}; font-size: 11px; font-weight: 800; } .artisan-chart { display: flex; height: 230px; gap: 17px; padding-top: 16px; } .artisan-chart-y { display: flex; flex-direction: column; justify-content: space-between; color: ${C.fgFaint}; font-size: 10px; } .artisan-bars { display: flex; align-items: flex-end; justify-content: space-around; flex: 1; border-bottom: 1px solid ${C.border}; background: repeating-linear-gradient(to bottom, transparent 0, transparent 54px, ${C.border} 55px); } .artisan-bar-column { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px; } .artisan-bar { width: clamp(18px, 4vw, 38px); min-height: 8px; border-radius: 5px 5px 0 0; } .artisan-bar-column small { color: ${C.fgDim}; font-size: 10px; } .artisan-sales-summary { display: flex; flex-direction: column; } .artisan-sales-summary .artisan-panel { flex: 1; } .artisan-sales-summary strong { display: block; margin: 11px 0 5px; font: 700 24px var(--font-fraunces); } .artisan-sales-summary small { color: ${C.fgDim}; font-size: 11px; }
+      .artisan-export-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; } .artisan-export-card-grid button { display: grid; grid-template-columns: 28px 1fr; grid-template-rows: auto auto; gap: 2px 9px; padding: 14px; border: 1px solid ${C.border}; border-radius: 8px; background: ${C.bg}; text-align: left; cursor: pointer; } .artisan-export-card-grid button:hover { border-color: ${C.primary}; } .artisan-export-card-grid span { grid-row: 1 / span 2; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-size: 12px; font-weight: 800; } .artisan-export-card-grid .done { background: ${C.primary}18; color: ${C.primary}; } .artisan-export-card-grid .todo { background: ${C.muted}; color: ${C.fgDim}; } .artisan-export-card-grid strong { font-size: 12px; } .artisan-export-card-grid small { color: ${C.fgDim}; font-size: 10px; } .artisan-export-tip { background: ${C.purple}; color: ${C.card}; } .artisan-export-tip .artisan-tip-icon { font-size: 25px; color: #E7B9D6; } .artisan-export-tip h2 { margin: 20px 0 9px; font: 700 24px/1.1 var(--font-fraunces); } .artisan-export-tip p { color: #F1DDEB; font-size: 13px; line-height: 1.6; } .artisan-export-tip .artisan-outline-button { margin-top: 13px; border-color: #E7B9D6; color: ${C.card}; }
+      .artisan-help-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; } .artisan-help-card { min-height: 205px; padding: 22px; border: 1px solid ${C.border}; border-radius: 10px; background: ${C.card}; text-align: left; cursor: pointer; } .artisan-help-card:hover { border-color: ${C.primary}; transform: translateY(-2px); } .artisan-help-card > span { display: grid; place-items: center; width: 36px; height: 36px; margin-bottom: 21px; border-radius: 8px; background: ${C.primary}18; color: ${C.primary}; font-weight: 800; font-size: 18px; } .artisan-help-card strong, .artisan-help-card small, .artisan-help-card b { display: block; } .artisan-help-card strong { font-size: 14px; } .artisan-help-card small { margin-top: 8px; color: ${C.fgDim}; font-size: 12px; line-height: 1.5; } .artisan-help-card b { margin-top: 18px; color: ${C.primary}; font-size: 11px; }
+      .artisan-dialog-backdrop { position: fixed; inset: 0; z-index: 400; display: grid; place-items: center; padding: 20px; background: rgba(58,41,37,.48); } .artisan-dialog { position: relative; width: min(680px, 100%); max-height: min(850px, calc(100vh - 40px)); overflow-y: auto; padding: 28px; border-radius: 13px; background: ${C.card}; box-shadow: 0 24px 70px rgba(58,41,37,.28); box-sizing: border-box; } .artisan-small-dialog { width: min(430px, 100%); } .artisan-dialog-close { position: absolute; top: 16px; right: 18px; border: 0; background: none; color: ${C.fgDim}; font-size: 25px; line-height: 1; cursor: pointer; } .artisan-dialog h2 { margin: 8px 0; font: 700 28px var(--font-fraunces); } .artisan-dialog p { color: ${C.fgDim}; font-size: 13px; } .artisan-dialog-detail { display: flex; justify-content: space-between; gap: 15px; padding: 14px 0; border-top: 1px solid ${C.border}; color: ${C.fgDim}; font-size: 13px; } .artisan-dialog .artisan-primary-button { margin-top: 18px; } .artisan-dialog-heading { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 22px; } .artisan-upload-area { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px; border: 1px dashed ${C.primary}99; border-radius: 8px; background: ${C.primary}08; } .artisan-upload-area strong, .artisan-upload-area small { display: block; } .artisan-upload-area strong { font-size: 13px; } .artisan-upload-area small { margin-top: 3px; color: ${C.fgDim}; font-size: 11px; } .artisan-upload-button { padding: 9px 12px; border-radius: 6px; background: ${C.primary}; color: ${C.card}; cursor: pointer; font-size: 11px; font-weight: 800; white-space: nowrap; } .artisan-upload-button input { display: none; } .artisan-upload-previews { display: flex; flex-wrap: wrap; gap: 10px; margin: 13px 0 18px; } .artisan-upload-preview { width: 105px; overflow: hidden; border: 1px solid ${C.border}; border-radius: 7px; background: ${C.bg}; } .artisan-upload-preview.is-main { border: 2px solid ${C.primary}; } .artisan-upload-preview img { width: 100%; height: 75px; display: block; object-fit: cover; } .artisan-upload-preview div { display: flex; flex-wrap: wrap; gap: 2px; padding: 4px; } .artisan-upload-preview button { border: 0; padding: 3px; background: transparent; color: ${C.fgDim}; cursor: pointer; font-size: 9px; } .artisan-upload-preview button:first-child { width: 100%; color: ${C.primary}; font-weight: 800; }
+      .artisan-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-top: 18px; } .artisan-form-grid label { color: ${C.fgDim}; font-size: 11px; font-weight: 800; } .artisan-form-grid input, .artisan-form-grid select, .artisan-form-grid textarea { display: block; width: 100%; margin-top: 6px; padding: 10px 11px; border: 1px solid ${C.border}; border-radius: 6px; outline: 0; box-sizing: border-box; background: ${C.bg}; color: ${C.fg}; font: 13px var(--font-nunito); resize: vertical; } .artisan-form-grid input:focus, .artisan-form-grid select:focus, .artisan-form-grid textarea:focus { border-color: ${C.primary}; } .artisan-form-full { grid-column: 1 / -1; } .artisan-form-error { color: ${C.accent} !important; font-size: 12px !important; font-weight: 700; } .artisan-dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 17px; border-top: 1px solid ${C.border}; } .artisan-toast { position: fixed; right: 24px; bottom: 24px; z-index: 500; max-width: min(360px, calc(100vw - 48px)); padding: 13px 16px; border-radius: 7px; background: ${C.fg}; color: ${C.card}; box-shadow: 0 10px 28px rgba(58,41,37,.22); font-size: 13px; font-weight: 700; }
+      .artisan-brand-button { border: 0; padding: 0; background: transparent; cursor: pointer; }
+      .artisan-dashboard-shell { background: radial-gradient(circle at 85% 0%, ${C.primary}09, transparent 29%), ${C.bg}; }
+      .artisan-dashboard-header { height: 82px; padding: 0 clamp(18px, 5vw, 72px); gap: 28px; background: #FBF5E9; }
+      .artisan-dashboard-logo { width: 194px; height: 68px; }
+      .artisan-header-context strong { font-family: var(--font-fraunces); font-weight: 600; }
+      .artisan-sidebar { width: 248px; padding: 39px 20px 26px; background: #F2E6D5; }
+      .artisan-sidebar-greeting { padding-bottom: 31px; }.artisan-sidebar-greeting strong { font-size: 28px; }.artisan-sidebar-greeting small { margin-top: 7px; color: ${C.fgFaint}; font-size: 11px; line-height: 1.45; }
+      .artisan-side-link { border-radius: 10px; padding: 13px 14px; margin: 3px 0; transition: .18s; }.artisan-side-link:hover, .artisan-side-link.is-active { box-shadow: 0 6px 18px rgba(58,41,37,.07); }
+      .artisan-dashboard-content { padding: clamp(30px, 5vw, 62px) clamp(22px, 5vw, 72px) 90px; }
+      .artisan-welcome-row h1, .artisan-page-heading h1 { font-size: clamp(2.2rem, 4vw, 3.65rem); letter-spacing: -.035em; }
+      .artisan-primary-button, .artisan-outline-button { border-radius: 99px; padding: 12px 19px; transition: .18s; }.artisan-primary-button:hover, .artisan-outline-button:hover { transform: translateY(-2px); }
+      .artisan-purpose-note { display: flex; align-items: center; gap: 14px; margin-bottom: 25px; padding: 16px 19px; border: 1px solid ${C.primary}38; border-radius: 15px; background: linear-gradient(100deg, ${C.primary}12, ${C.card}); }.artisan-purpose-note > span { display: grid; place-items: center; width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; background: ${C.primary}; color: ${C.card}; font-size: 18px; }.artisan-purpose-note strong { font: 700 17px var(--font-fraunces); }.artisan-purpose-note p { margin: 2px 0 0; color: ${C.fgDim}; font-size: 12px; line-height: 1.5; }.artisan-purpose-note button { margin-left: auto; border: 0; background: none; color: ${C.primary}; font: 800 11px var(--font-nunito); cursor: pointer; white-space: nowrap; }
+      .artisan-stat-card, .artisan-panel, .artisan-product-card, .artisan-help-card { border-radius: 15px; }.artisan-stat-card { min-height: 145px; padding: 19px; }.artisan-stat-icon { border-radius: 50%; }.artisan-panel { padding: 23px; box-shadow: 0 7px 22px rgba(58,41,37,.035); }.artisan-shortcut-grid button, .artisan-export-card-grid button { border-radius: 11px; transition: .18s; }.artisan-shortcut-grid button:hover, .artisan-export-card-grid button:hover { transform: translateY(-2px); }
+      .artisan-product-card { transition: .2s; }.artisan-product-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(58,41,37,.08); }
+      .artisan-language-strip { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 18px; padding-top: 16px; border-top: 1px solid ${C.border}; }.artisan-language-strip strong { margin-right: 4px; font: 700 13px var(--font-fraunces); }.artisan-language-strip span { display: grid; place-items: center; width: 28px; height: 22px; border-radius: 99px; background: ${C.primary}18; color: ${C.primary}; font-size: 10px; font-weight: 800; }.artisan-language-strip small { flex-basis: 100%; color: ${C.fgDim}; font-size: 11px; }
+      .artisan-export-tools { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; }.artisan-cost-card p { margin: -8px 0 18px; color: ${C.fgDim}; font-size: 12px; line-height: 1.5; }.artisan-cost-total { color: ${C.primary}; font: 700 25px var(--font-fraunces); }.artisan-cost-fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }.artisan-cost-fields label { color: ${C.fgDim}; font-size: 10px; font-weight: 800; }.artisan-cost-fields label span { float: right; color: ${C.fgFaint}; }.artisan-cost-fields input { display: block; width: 100%; margin-top: 5px; padding: 9px 8px; border: 1px solid ${C.border}; border-radius: 8px; background: ${C.bg}; color: ${C.fg}; font: 13px var(--font-nunito); box-sizing: border-box; }.artisan-journey-card h2 { margin: 5px 0 15px; font: 700 22px var(--font-fraunces); }.artisan-journey-card ol { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }.artisan-journey-card li { display: flex; gap: 10px; align-items: flex-start; color: ${C.fgDim}; font-size: 11px; line-height: 1.4; }.artisan-journey-card li b { color: ${C.primary}; font-size: 10px; }.artisan-text-button { margin-top: 16px; padding: 0; border: 0; background: none; color: ${C.primary}; font: 800 11px var(--font-nunito); cursor: pointer; } .artisan-export-layout { grid-template-columns: 1fr; } @media (max-width: 1050px) { .artisan-sidebar { width: 200px; } .artisan-stat-grid { grid-template-columns: 1fr 1fr; } .artisan-overview-grid, .artisan-sales-grid { grid-template-columns: 1fr; } }
+      @media (max-width: 700px) { .artisan-dashboard-header { height: 68px; gap: 10px; padding: 0 16px; } .artisan-dashboard-logo { width: 145px; height: 56px; } .artisan-header-context, .artisan-site-link { display: none; } .artisan-dashboard-layout { display: block; } .artisan-sidebar { display: none; } .artisan-dashboard-content { padding: 20px 15px 70px; } .artisan-mobile-nav { display: flex; gap: 5px; overflow-x: auto; margin: -3px 0 24px; padding-bottom: 3px; } .artisan-mobile-nav button { padding: 8px 11px; border: 1px solid ${C.border}; border-radius: 99px; background: transparent; color: ${C.fgDim}; font: 700 11px var(--font-nunito); white-space: nowrap; } .artisan-mobile-nav button.is-active { border-color: ${C.primary}; background: ${C.primary}; color: ${C.card}; } .artisan-welcome-row, .artisan-page-heading { display: block; margin-bottom: 24px; } .artisan-welcome-row .artisan-primary-button, .artisan-page-heading .artisan-primary-button { margin-top: 17px; } .artisan-welcome-row h1, .artisan-page-heading h1 { font-size: 2.3rem; } .artisan-stat-grid { gap: 9px; } .artisan-stat-card { min-height: 126px; padding: 13px; } .artisan-stat-card strong { font-size: 23px; } .artisan-stat-card small { font-size: 10px; } .artisan-panel { padding: 16px; } .artisan-overview-grid, .artisan-shortcut-grid, .artisan-product-grid, .artisan-export-card-grid, .artisan-help-grid, .artisan-form-grid, .artisan-export-tools, .artisan-cost-fields { grid-template-columns: 1fr; } .artisan-order-row, .artisan-message-row { gap: 9px; } .artisan-order-date { display: none; } .artisan-order-value { width: auto; margin-left: auto; } .artisan-status-pill { display: none; } .artisan-dialog { padding: 22px 16px; } .artisan-upload-area { align-items: flex-start; flex-direction: column; } .artisan-upload-preview { width: calc(33.333% - 7px); } .artisan-dialog-actions { flex-direction: column-reverse; } .artisan-dialog-actions button { width: 100%; } }
+      @media (max-width: 700px) { .artisan-purpose-note { align-items: flex-start; flex-wrap: wrap; } .artisan-purpose-note button { flex-basis: 100%; margin: 4px 0 0 52px; text-align: left; } .artisan-export-tools { grid-template-columns: 1fr; } .artisan-cost-fields { grid-template-columns: 1fr; } }
+      @media (max-width: 480px) {
+        .artisan-dashboard-header { padding: 0 12px; gap: 8px; }
+        .artisan-dashboard-logo { width: 128px; height: 54px; }
+        .artisan-header-actions { gap: 6px; }
+        .artisan-header-icon, .artisan-avatar { width: 40px; height: 40px; }
+        .artisan-dashboard-content { padding: 16px 12px 64px; }
+        .artisan-mobile-nav { margin-bottom: 20px; padding-right: 2px; }
+        .artisan-mobile-nav button, .artisan-primary-button, .artisan-outline-button { min-height: 42px; }
+        .artisan-welcome-row h1, .artisan-page-heading h1 { font-size: 2rem; }
+        .artisan-welcome-row p, .artisan-page-heading p { font-size: 13px; }
+        .artisan-page-heading .artisan-page-count { display: inline-flex; margin-top: 12px; }
+        .artisan-panel { padding: 14px; border-radius: 12px; }
+        .artisan-panel-heading h2 { font-size: 20px; }
+        .artisan-stat-card { min-height: 118px; padding: 12px; }
+        .artisan-stat-card strong { font-size: 21px; }
+        .artisan-stat-label, .artisan-stat-card small { font-size: 10px; }
+        .artisan-order-row, .artisan-message-row { gap: 7px; padding: 12px 0; }
+        .artisan-order-info strong { font-size: 12px; }
+        .artisan-order-info small { font-size: 10px; }
+        .artisan-order-value { width: auto; font-size: 11px; }
+        .artisan-chevron { font-size: 15px; }
+        .artisan-dialog-backdrop { padding: 8px; place-items: end center; }
+        .artisan-dialog { max-height: calc(100dvh - 16px); padding: 20px 14px 14px; border-radius: 16px 16px 10px 10px; }
+        .artisan-dialog-heading { padding-right: 28px; }
+        .artisan-dialog h2 { font-size: 24px; }
+        .artisan-upload-area { padding: 12px; }
+        .artisan-upload-button { min-height: 40px; display: inline-flex; align-items: center; }
+        .artisan-upload-preview { width: calc(33.333% - 7px); min-width: 84px; }
+        .artisan-upload-preview button { min-height: 28px; }
+        .artisan-form-grid { gap: 11px; }
+        .artisan-form-grid input, .artisan-form-grid select, .artisan-form-grid textarea { min-height: 42px; font-size: 16px; }
+        .artisan-form-grid textarea { min-height: 92px; }
+      }
+      @media (max-width: 360px) {
+        .artisan-dashboard-logo { width: 112px; }
+        .artisan-header-icon { display: none; }
+        .artisan-stat-grid { gap: 7px; }
+        .artisan-stat-card { min-height: 112px; padding: 10px; }
+        .artisan-stat-card strong { font-size: 19px; }
+        .artisan-purpose-note button { margin-left: 0; }
+        .artisan-upload-preview { width: calc(50% - 5px); }
+      }
+    `}</style>
+  </div>;
+}
+
 export default function App() {
   const [lang, setLang] = useState<Lang>("pt");
   const [activePage, setActivePage] = useState<"home" | "about" | "products" | "login" | "artisanSignup" | "accountSignup" | "accountDashboard">("home");
-  const [activeCategory, setActiveCategory] = useState<CatKey>("all");
+  const [activeCategory, setActiveCategory] = useState("Todos");
   const [menuOpen, setMenuOpen] = useState(false);
   const [form, setForm] = useState({ nome: "", whatsapp: "", email: "", instagram: "", address: "", product: "" });
   const [submitted, setSubmitted] = useState(false);
@@ -851,6 +1065,8 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activePage]);
 
+  const catKeys = ["all", "acessorios", "joias", "casa", "vestuario", "brinquedos"] as const;
+  type CatKey = typeof catKeys[number];
   const catMap: Record<CatKey, string> = {
     all: t(T.products.categories.all, lang),
     acessorios: t(T.products.categories.acessorios, lang),
@@ -879,6 +1095,7 @@ export default function App() {
     setAccountCreated(true);
   }
 
+  const artisanDashboard = activePage === "accountDashboard" && accountRole === "artisan";
 
   return (
     <div style={{ minHeight: "100%", width: "100%", maxWidth: "100%", overflowX: "hidden", background: C.bg, color: C.fg, fontFamily: "var(--font-nunito)" }}>
@@ -901,8 +1118,6 @@ export default function App() {
           overflow-x: hidden;
           margin: 0;
         }
-
-        .buyer-site-nav-hidden { display: none; }
 
         .site-nav-links {
           display: flex;
@@ -985,7 +1200,7 @@ export default function App() {
         }
       `}</style>
 
-      <nav className={accountRole === "artisan" && activePage === "accountDashboard" ? "buyer-site-nav-hidden" : undefined} style={{
+      {!artisanDashboard && <nav style={{
         background: "#FBF5E9",
         borderBottom: `2px solid ${C.border}`,
         position: "sticky",
@@ -1084,7 +1299,7 @@ export default function App() {
               flexShrink: 0
             }}
           >
-            <UserMenu lang={lang} signedIn={accountCreated} role={accountRole} onOpenAccount={() => setActivePage("accountDashboard")} onBuyerOrders={() => setActivePage("accountDashboard")} onBuyerSettings={() => setActivePage("accountDashboard")} onCreateAccount={() => setActivePage("accountSignup")} onLogin={() => setActivePage("login")} onArtisanSignup={() => setActivePage("artisanSignup")} />
+            <UserMenu lang={lang} signedIn={accountCreated} role={accountRole} onOpenAccount={() => setActivePage("accountDashboard")} onCreateAccount={() => setActivePage("accountSignup")} onLogin={() => setActivePage("login")} onArtisanSignup={() => setActivePage("artisanSignup")} />
             <CartButton lang={lang} count={cartCount} />
             <LangSwitcher lang={lang} setLang={setLang} />
 
@@ -1151,7 +1366,7 @@ export default function App() {
             ))}
           </div>
         )}
-      </nav>
+      </nav>}
 
       <div className="page-transition">
         {activePage === "home" ? (
@@ -1425,7 +1640,7 @@ export default function App() {
               </h2>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {CAT_KEYS.map(key => (
+              {catKeys.map(key => (
                 <button key={key} onClick={() => setActiveCategory(key)}
                   style={{ padding: "8px 18px", borderRadius: 99, fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.18s", background: activeCategory === key ? C.primary : "transparent", color: activeCategory === key ? C.bg : C.fgDim, border: `1.5px solid ${activeCategory === key ? C.primary : C.border}` }}>
                   {catMap[key]}
@@ -1672,20 +1887,22 @@ export default function App() {
         ) : activePage === "accountSignup" ? (
           <AccountSignupPage lang={lang} onCreated={() => { setAccountCreated(true); setAccountRole("buyer"); }} />
         ) : activePage === "login" ? (
-          <LoginPage lang={lang} onLogin={(role) => { setAccountCreated(true); setAccountRole(role); setActivePage(role === "artisan" ? "accountDashboard" : "home"); }} onCreateAccount={() => {
+          <LoginPage lang={lang} onLogin={(role) => { setAccountCreated(true); setAccountRole(role); setActivePage("accountDashboard"); }} onCreateAccount={() => {
             setActivePage("accountSignup");
           }} />
         ) : activePage === "accountDashboard" ? (
-          <AccountDashboard lang={lang} role={accountRole || "buyer"} onBack={() => setActivePage("home")} />
+          accountRole === "artisan"
+            ? <ArtisanDashboard lang={lang} onBack={() => setActivePage("home")} />
+            : <AccountDashboard lang={lang} role="buyer" onBack={() => setActivePage("home")} />
         ) : (
-          <ProdutosPageNova lang={lang} activeCategory={activeCategory} catMap={catMap} onCategoryChange={setActiveCategory} onJoin={() => {
+          <ProdutosPageNova lang={lang} onJoin={() => {
             setActivePage("artisanSignup");
           }} />
         )}
       </div>
 
       {/* ── FOOTER ── */}
-      <footer style={{ background: "#FBF5E9", borderTop: `1px solid ${C.border}`, padding: "52px 24px 32px" }}>
+      {!artisanDashboard && <footer style={{ background: "#FBF5E9", borderTop: `1px solid ${C.border}`, padding: "52px 24px 32px" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto" }}>
           <div
             className="footer-content"
@@ -1726,7 +1943,7 @@ export default function App() {
             <p style={{ color: "rgba(58,41,37,0.30)", fontSize: 11.5, marginTop: 8 }}>{t(T.footer.pride, lang)}</p>
           </div>
         </div>
-      </footer>
+      </footer>}
 
       <CustomerSupport lang={lang} />
     </div>
