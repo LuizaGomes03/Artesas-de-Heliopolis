@@ -47,7 +47,6 @@ class HomePage extends StatelessWidget {
               height: 62,
               fit: BoxFit.contain,
             ),
-            const Spacer(),
             if (desktop) ...[
               _nav('Início', active: true),
               _nav('Loja'),
@@ -399,7 +398,6 @@ class HomePage extends StatelessWidget {
         const Text('Quando uma artesã cresce, a comunidade inteira floresce.', style: TextStyle(color: Colors.white, fontSize: 29, height: 1.08, fontWeight: FontWeight.w900)),
         const SizedBox(height: 17),
         const Text('As artesãs de Heliópolis, na zona sul de São Paulo, transformam o artesanato em uma importante ferramenta de geração de renda, autonomia e transformação.', style: TextStyle(color: Color(0xFFF6F2E7), fontSize: 14, height: 1.55)),
-        const Spacer(),
         const SizedBox(height: 24),
         _ghostButton('CONHEÇA AS ARTESÃS'),
       ]),
