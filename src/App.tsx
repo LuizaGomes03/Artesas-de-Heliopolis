@@ -514,12 +514,13 @@ function UserMenu({ lang, signedIn, role, onLogin, onCreateAccount, onArtisanSig
             onMouseEnter={e => { e.currentTarget.style.background = C.muted; e.currentTarget.style.color = C.fg; }}
             onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = C.fgDim; }}>
             {lang === "pt" ? "Cadastrar-se" : lang === "en" ? "Sign up" : "Registrarse"}
-          </button>}
-          <button type="button" onClick={() => { close(); onLogin(); }} style={{ ...itemStyle, paddingBottom: 14 }}
+          </button>
+          {!signedIn && <button type="button" onClick={() => { close(); onLogin(); }} style={{ ...itemStyle, paddingBottom: 14 }}
             onMouseEnter={e => { e.currentTarget.style.background = C.muted; e.currentTarget.style.color = C.fg; }}
             onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = C.fgDim; }}>
             {lang === "pt" ? "Entrar" : lang === "en" ? "Log in" : "Iniciar sesión"}
-          </button>
+          </button>}
+          </>}
         </div>
       )}
     </div>
